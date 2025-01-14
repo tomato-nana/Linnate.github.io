@@ -43,7 +43,7 @@ function loadCss(url) {
     link.href = url;
 
     link.onload = () => resolve(); // 样式加载成功
-    link.onerror = () => reject(new Error(`Failed to load CSS: ${url}`)); // 样式加载失败
+    link.onerror = () => reject(new Error(`Failed to load : ${url}`)); // 样式加载失败
 
     document.head.appendChild(link);
   });
@@ -159,7 +159,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
   const prepared = document.createElement('template')
   prepared.innerHTML = `
       <style>
-        @import url("http://localhost:3000/handsontable.full.min.css");
+        @import url("https://tomato-nana.github.io/Linnate.github.io/handsontable.full.min.css");
       </style>
       <div id="root" style="width: 100%; height: 100%;"></div>
     `
@@ -303,7 +303,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
       // // let myColHeaderTmp = this.myColHeader || true;
       
       try {
-        // await loadCss('./handsontable.full.min.css');
+        await loadCss('./handsontable.full.min.css');
         await getScriptPromisify('./handsontable.full.min.js');
         await getScriptPromisify('./zh-CN.js');
         await getScriptPromisify('./hyperformula.full.min.js');
