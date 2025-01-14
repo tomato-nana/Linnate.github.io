@@ -303,7 +303,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
       // // let myColHeaderTmp = this.myColHeader || true;
       
       try {
-        await loadCss('./handsontable.full.min.css');
+        await loadCss('https://tomato-nana.github.io/Linnate.github.io/handsontable.full.min.css');
         await getScriptPromisify('./handsontable.full.min.js');
         await getScriptPromisify('./zh-CN.js');
         await getScriptPromisify('./hyperformula.full.min.js');
