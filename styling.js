@@ -11,80 +11,121 @@
         #root label {
           margin-top: 16px;
         }
-        #root select {
-          font-size: 14px;
-          width: 120px;
+        #root input, #root select {
+          width: 100%;
+          height: 80px;
+          border: 1px solid #666;
+          padding: 3px 5px;
+          box-sizing: border-box;
         }
         #root button {
           display: block;
-          margin-top: 16px;
+          width: 50px;
+          height: 30px;
+          background-color:rgb(228, 129, 63);
+          color: #fff;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          margin-top: 20px;
+        }
+        #root button:hover {
+          background-color:rgb(218, 80, 17);
         }
         #root strong {
+          color: #666;
           white-space: normal;
           margin-top: 16px;
+          display: block;
+        }
+        #root h4 {
+          font-size: 18px;
+          color: #333;
+          margin-bottom: 10px;
         }
       </style>
       <div id="root" style="width: 100%; height: 100%;">
         <div id="atteintion">
-            <strong>Please confirm the model, measures, and dimensions before editing the table. Any changes in Builder panel will reset all your change to the default status.</strong>
-        <div id="myCustomUnit">
-            <label for="myCustomUnit-input">单位</label>
-            <input id="myCustomUnit-input" style="width: 70%; height: 100%;" placeholder="请输入自定义单位名称"/>
+              <strong>Please confirm the model, measures, and dimensions before editing the table. Any changes in Builder panel will reset all your change to the default status.</strong>
         </div>
-        <div id="myCustomScale">
-            <label for="myCustomScale-input">倍数</label>
-            <input id="myCustomScale-input" style="width: 70%; height: 100%;" placeholder="请输入倍数"/>
+        <div>
+          <h4>数据格式设置</h4>
+          <div id="myCustomUnit">
+              <label for="myCustomUnit-input">单位</label>
+              <input id="myCustomUnit-input" style="width: 70%; height: 100%;" placeholder="请输入自定义单位名称"/>
+          </div>
+          <div id="myCustomScale">
+              <label for="myCustomScale-input">数级</label>
+              <input id="myCustomScale-input" style="width: 70%; height: 100%;" placeholder="请输入整数"/>
+          </div>
+          <div id="myCustomDecimalPlaces">
+              <label for="myCustomDecimalPlaces-dropdown">小数位数</label>
+              <select id="myCustomDecimalPlaces-dropdown" style="width: 50%; height: 100%;">
+                <option value=0>0</option>
+                <option value=1>1</option>
+                <option value=2>2</option>
+                <option value=3>3</option>
+                <option value=4>4</option>
+                <option value=4>5</option>
+                <option value=4>6</option>
+                <option value=4>7</option>
+              </select>
+          </div>
+          <div id="myCustomThousandSeparator">
+              <label for="myCustomThousandSeparator-dropdown">数据格式</label>
+              <select id="myCustomThousandSeparator-dropdown" style="width: 50%; height: 100%;">
+                <option value=1>12,345.67</option>
+                <option value=2>12.345,67</option>
+                <option value=3>12 345.67</option>
+              </select>
+          </div>
         </div>
-        <div id="myCustomDecimalPlaces">
-            <label for="myCustomDecimalPlaces-dropdown">请选择保留几位小数</label>
-            <select id="myCustomDecimalPlaces-dropdown" style="width: 50%; height: 100%;">
-              <option value=0>0</option>
-              <option value=1>1</option>
-              <option value=2>2</option>
-              <option value=3>3</option>
-              <option value=4>4</option>
-            </select>
+        <div>
+          <h4>行/列标题</h4>
+          <div id="myRowHeader">
+              <label for="myRowHeader-dropdown">行标题</label>
+              <select id="myRowHeader-dropdown" style="width: 50%; height: 100%;">
+                <option value=true>开</option>
+                <option value=false>关</option>
+              </select>
+          </div>
+          <div id="myColHeader">
+              <label for="myColHeader-dropdown">列标题</label>
+              <select id="myColHeader-dropdown" style="width: 50%; height: 100%;">
+                <option value=true>开</option>
+                <option value=false>关</option>
+              </select>
+          </div>
+          <div id="myContextMenu" style="display: none;">
+              <label for="myContextMenu-dropdown">myContextMenu</label>
+              <select id="myContextMenu-dropdown" style="width: 50%; height: 100%;">
+                <option value=true>开</option>
+                <option value=false>关</option>
+              </select>
+          </div>
         </div>
-        <div id="myCustomThousandSeparator">
-            <label for="myCustomThousandSeparator-dropdown">请选择数据格式</label>
-            <select id="myCustomThousandSeparator-dropdown" style="width: 50%; height: 100%;">
-              <option value=1>12,345.67</option>
-              <option value=2>12.345,67</option>
-              <option value=3>12 345.67</option>
-            </select>
-        </div>
-        <div id="myIndentSettings">
-            <label for="myIndentSettings-input">缩进设置(readonly)</label>
-            <input id="myIndentSettings-input" type="text" style="width: 70%; height: 100%;" readonly/>
-        </div>
-        <div id="myInsertData">
-            <label for="myInsertData-input">自定义插入数据(readonly)</label>
-            <input id="myInsertData-input" style="width: 70%; height: 100%;" readonly/>
-        </div>
-        <div id="myMergeData">
-            <label for="myMergeData-input">合并单元格数据(readonly)</label>
-            <input id="myMergeData-input" style="width: 70%; height: 100%;" readonly/>
-        </div>
-        <div id="myRowHeader">
-            <label for="myRowHeader-dropdown">行头</label>
-            <select id="myRowHeader-dropdown" style="width: 50%; height: 100%;">
-              <option value=true>开</option>
-              <option value=false>关</option>
-            </select>
-        </div>
-        <div id="myColHeader">
-            <label for="myColHeader-dropdown">列头</label>
-            <select id="myColHeader-dropdown" style="width: 50%; height: 100%;">
-              <option value=true>开</option>
-              <option value=false>关</option>
-            </select>
-        </div>
-        <div id="myContextMenu" style="display: none;">
-            <label for="myContextMenu-dropdown">myContextMenu</label>
-            <select id="myContextMenu-dropdown" style="width: 50%; height: 100%;">
-              <option value=true>开</option>
-              <option value=false>关</option>
-            </select>
+        <div>
+          <h4>自定义格式</h4>
+          <div id="myInsertData">
+              <label for="myInsertData-input">自定义新增数据(readonly)</label>
+              <input id="myInsertData-input" style="width: 70%; height: 100%;" readonly/>
+          </div>
+          <div id="myIndentSettings">
+              <label for="myIndentSettings-input">缩进数据(readonly)</label>
+              <input id="myIndentSettings-input" type="text" style="width: 70%; height: 100%;" readonly/>
+          </div>
+          <div id="myMergeData">
+              <label for="myMergeData-input">合并单元格数据(readonly)</label>
+              <input id="myMergeData-input" style="width: 70%; height: 100%;" readonly/>
+          </div>
+          <div id="myPercentageSettings">
+              <label for="myPercentageSettings-input">显示为百分数(readonly)</label>
+              <input id="myPercentageSettings-input" style="width: 70%; height: 100%;" readonly/>
+          </div>
+          <div id="myAlignmentSettings">
+              <label for="myAlignmentSettings-input">对齐方式(readonly)</label>
+              <input id="myAlignmentSettings-input" style="width: 70%; height: 100%;" readonly/>
+          </div>
         </div>
         <button id="button">Apply</button>
       </div>
@@ -106,6 +147,8 @@
           const myIndentSettings = this._shadowRoot.getElementById('myIndentSettings-input').value;
           const myInsertData = this._shadowRoot.getElementById('myInsertData-input').value;
           const myMergeData = this._shadowRoot.getElementById('myMergeData-input').value;
+          const myPercentageSettings = this._shadowRoot.getElementById('myPercentageSettings-input').value;
+          const myAlignmentSettings = this._shadowRoot.getElementById('myAlignmentSettings-input').value;
           const myCustomUnit = this._shadowRoot.getElementById('myCustomUnit-input').value;
           const myCustomScale = this._shadowRoot.getElementById('myCustomScale-input').value;
           const myCustomDecimalPlaces = this._shadowRoot.getElementById('myCustomDecimalPlaces-dropdown').value;
@@ -116,6 +159,8 @@
               myIndentSettings, 
               myInsertData, 
               myMergeData,
+              myPercentageSettings,
+              myAlignmentSettings,
               myCustomUnit,
               myCustomScale,
               myCustomDecimalPlaces,
@@ -123,12 +168,8 @@
               myRowHeader,
               myColHeader
             } } }));
-          // console.log('按钮被点击了--myCustomUnit',myCustomUnit);
-          // console.log('按钮被点击了--myCustomScale',myCustomScale);
-          // console.log('按钮被点击了--myCustomDecimalPlaces',myCustomDecimalPlaces);
-          // console.log('按钮被点击了--myCustomThousandSeparator',myCustomThousandSeparator);
-          console.log('按钮被点击了--myRowHeader',myRowHeader);
-          console.log('按钮被点击了--myColHeader',myColHeader);
+          // console.log('按钮被点击了--myRowHeader',myRowHeader);
+          // console.log('按钮被点击了--myColHeader',myColHeader);
         })
       }
   
@@ -151,6 +192,18 @@
           // console.log('onCustomWidgetAfterUpdate---myMergeData',myMergeData);
         };
 
+        if (changedProps.myPercentageSettings) {
+          const myPercentageSettings = changedProps.myPercentageSettings;
+          this._shadowRoot.getElementById('myPercentageSettings-input').value = changedProps.myPercentageSettings;
+          // console.log('onCustomWidgetAfterUpdate---myPercentageSettings',myPercentageSettings);
+        };
+
+        if (changedProps.myAlignmentSettings) {
+          const myAlignmentSettings = changedProps.myAlignmentSettings;
+          this._shadowRoot.getElementById('myAlignmentSettings-input').value = changedProps.myAlignmentSettings;
+          // console.log('onCustomWidgetAfterUpdate---myAlignmentSettings',myAlignmentSettings);
+        };
+
         if (changedProps.myCustomUnit) {
           const myCustomUnit = changedProps.myCustomUnit;
           this._shadowRoot.getElementById('myCustomUnit-input').value = changedProps.myCustomUnit;
@@ -166,41 +219,41 @@
         if (changedProps.myCustomDecimalPlaces !== undefined && changedProps.myCustomDecimalPlaces !== null && changedProps.myCustomDecimalPlaces !== '') {
           let myCustomDecimalPlaces = changedProps.myCustomDecimalPlaces;
           this._shadowRoot.getElementById('myCustomDecimalPlaces-dropdown').value = myCustomDecimalPlaces;
-          console.log('onCustomWidgetAfterUpdate---myCustomDecimalPlaces-if',myCustomDecimalPlaces);
+          // console.log('onCustomWidgetAfterUpdate---myCustomDecimalPlaces-if',myCustomDecimalPlaces);
         } else {
           let myCustomDecimalPlaces = 2;
           this._shadowRoot.getElementById('myCustomDecimalPlaces-dropdown').value = myCustomDecimalPlaces;
-          console.log('onCustomWidgetAfterUpdate---myCustomDecimalPlaces-else',myCustomDecimalPlaces);
+          // console.log('onCustomWidgetAfterUpdate---myCustomDecimalPlaces-else',myCustomDecimalPlaces);
         };
 
         if (changedProps.myCustomThousandSeparator !== undefined && changedProps.myCustomThousandSeparator !== null && changedProps.myCustomThousandSeparator !== '') {
           let myCustomThousandSeparator = changedProps.myCustomThousandSeparator;
           this._shadowRoot.getElementById('myCustomThousandSeparator-dropdown').value = myCustomThousandSeparator;
-          console.log('onCustomWidgetAfterUpdate---myCustomThousandSeparator-if',myCustomThousandSeparator);
+          // console.log('onCustomWidgetAfterUpdate---myCustomThousandSeparator-if',myCustomThousandSeparator);
         } else {
           let myCustomThousandSeparator = 0;
           this._shadowRoot.getElementById('myCustomThousandSeparator-dropdown').value = myCustomThousandSeparator;
-          console.log('onCustomWidgetAfterUpdate---myCustomThousandSeparator-else',myCustomThousandSeparator);
+          // console.log('onCustomWidgetAfterUpdate---myCustomThousandSeparator-else',myCustomThousandSeparator);
         };
 
         if (changedProps.myRowHeader !== undefined && changedProps.myRowHeader !== null && changedProps.myRowHeader !== '') {
           let myRowHeader = changedProps.myRowHeader;
           this._shadowRoot.getElementById('myRowHeader-dropdown').value = myRowHeader;
-          console.log('onCustomWidgetAfterUpdate---myRowHeader-if',myRowHeader);
+          // console.log('onCustomWidgetAfterUpdate---myRowHeader-if',myRowHeader);
         } else {
           let myRowHeader = true;
           this._shadowRoot.getElementById('myRowHeader-dropdown').value = myRowHeader;
-          console.log('onCustomWidgetAfterUpdate---myRowHeader-else',myRowHeader);
+          // console.log('onCustomWidgetAfterUpdate---myRowHeader-else',myRowHeader);
         };
 
         if (changedProps.myColHeader !== undefined && changedProps.myColHeader !== null && changedProps.myColHeader !== '') {
           let myColHeader = changedProps.myColHeader;
           this._shadowRoot.getElementById('myColHeader-dropdown').value = myColHeader;
-          console.log('onCustomWidgetAfterUpdate---myColHeader-if',myColHeader);
+          // console.log('onCustomWidgetAfterUpdate---myColHeader-if',myColHeader);
         } else {
           let myColHeader = true;
           this._shadowRoot.getElementById('myColHeader-dropdown').value = myColHeader;
-          console.log('onCustomWidgetAfterUpdate---myColHeader-else',myColHeader);
+          // console.log('onCustomWidgetAfterUpdate---myColHeader-else',myColHeader);
         };
 
       }
