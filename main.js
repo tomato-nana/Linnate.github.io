@@ -159,7 +159,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
   const prepared = document.createElement('template')
   prepared.innerHTML = `
       <style>
-        @import url("http://localhost:3000/handsontable.full.min.css");
+        @import url("https://tomato-nana.github.io/Linnate.github.io/handsontable.full.min.css");
       </style>
       <div id="root" style="width: 100%; height: 100%;"></div>
     `
@@ -284,10 +284,10 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
       
       try {
-        await loadCss('http://localhost:3000/handsontable.full.min.css');
-        await getScriptPromisify('http://localhost:3000/handsontable.full.min.js');
-        await getScriptPromisify('http://localhost:3000/zh-CN.js');
-        await getScriptPromisify('http://localhost:3000/hyperformula.full.min.js');
+        await loadCss('https://tomato-nana.github.io/Linnate.github.io/handsontable.full.min.css');
+        await getScriptPromisify('https://tomato-nana.github.io/Linnate.github.io/handsontable.full.min.js');
+        await getScriptPromisify('https://tomato-nana.github.io/Linnate.github.io/zh-CN.js');
+        await getScriptPromisify('https://tomato-nana.github.io/Linnate.github.io/hyperformula.full.min.js');
         console.log('CSS and JS files loaded successfully');
         } catch (error) {
           console.log('render的try出错了');
