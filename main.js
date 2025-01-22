@@ -43,7 +43,7 @@ function loadCss(url) {
     link.href = url;
 
     link.onload = () => resolve(); // 样式加载成功
-    link.onerror = () => reject(new Error(`Failed to load : ${url}`)); // 样式加载失败
+    link.onerror = () => reject(new Error(`Failed to load CSS: ${url}`)); // 样式加载失败
 
     document.head.appendChild(link);
   });
@@ -159,7 +159,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
   const prepared = document.createElement('template')
   prepared.innerHTML = `
       <style>
-        @import url("https://tomato-nana.github.io/Linnate.github.io/handsontable.full.min.css");
+        @import url("http://localhost:3000/handsontable.full.min.css");
       </style>
       <div id="root" style="width: 100%; height: 100%;"></div>
     `
@@ -275,61 +275,27 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
     async render () {
       this.myCustomScale = Number(this.myCustomScale);
-      // this.myRowHeader = stringToBoolean(this.myRowHeader);
-      // this.myColHeader = stringToBoolean(this.myColHeader);
       let mycustomDecimalPlacesTmp = this.myCustomDecimalPlaces || 2;
       let mycustomUnitTmp = this.myCustomUnit || '';
       let mycustomScaleTmp = this.myCustomScale || 1;
       let myCustomThousandSeparatorTmp = this.myCustomThousandSeparator || 0;
-      // 这里还是有很大的问题啊啊啊啊啊啊啊啊啊啊啊
       const isRowHeaderEnabled = this.myRowHeader === true || this.myRowHeader === 'true' || this.myRowHeader === undefined;
       const isColHeaderEnabled = this.myColHeader === true || this.myColHeader === 'true' || this.myColHeader === undefined;
-      console.log('isRowHeaderEnabled-isRowHeaderEnabled-isRowHeaderEnabled',isRowHeaderEnabled);
-      // let myRowHeaderTmp;
-      // let myColHeaderTmp;
 
-      // if(this.myRowHeader !== undefined){
-      //   myRowHeaderTmp = this.myRowHeader;
-      // } else{
-      //   myRowHeaderTmp = true;
-      // }
-
-      // if(this.myColHeader !== undefined){
-      //   myColHeaderTmp = this.myColHeader;
-      // } else{
-      //   myColHeaderTmp = true;
-      // }
-      // // let myRowHeaderTmp = this.myRowHeader || true;
-      // // let myColHeaderTmp = this.myColHeader || true;
       
       try {
-        await loadCss('https://tomato-nana.github.io/Linnate.github.io/handsontable.full.min.css');
-        await getScriptPromisify('https://tomato-nana.github.io/Linnate.github.io/handsontable.full.min.js');
-        await getScriptPromisify('https://tomato-nana.github.io/Linnate.github.io/zh-CN.js');
-        await getScriptPromisify('https://tomato-nana.github.io/Linnate.github.io/hyperformula.full.min.js');
+        await loadCss('http://localhost:3000/handsontable.full.min.css');
+        await getScriptPromisify('http://localhost:3000/handsontable.full.min.js');
+        await getScriptPromisify('http://localhost:3000/zh-CN.js');
+        await getScriptPromisify('http://localhost:3000/hyperformula.full.min.js');
         console.log('CSS and JS files loaded successfully');
-
-        /*
-          this.myInsertData存的数组
-          myInsertData存的是字符串
-          其他的变量同理
-          已经实现的：
-          （1）新增行列
-          （2）缩进/取消缩进
-          （3）计算（SUM/MAX/MIN）
-          需要完成的：
-          1.换模型之后(数据变动)全部重新初始化
-          2.菜单开关、rowHeaders和colHeaders显示开关
-          3.数据格式问题
-          4.保存对齐方式的内容
-          5.缩进跟随行列位置走，现在缩进的位置是固定的
-        */
         } catch (error) {
           console.log('render的try出错了');
           console.error(error.message);
         }
 
         let indentSettings = [];
+        let percentageSettings = [];
         let insertData = '';
         let readOnlyCells = []; 
         let mergedCells = [];   // 用于记录被合并的单元格
@@ -371,13 +337,17 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
             : formattedInteger;
         }
 
+        /**
+         * 转化为百分数，向缩进存储一样，添加转换百分数的菜单，
+         * 之后存储有哪些单元格需要转换成百分数（是number且需要转换百分数），之后再渲染
+         * @param {*} value 
+         * @param {*} decimalPlaces 
+         * @param {*} unit 
+         * @returns 
+         */
         const formatPercentage = (value, decimalPlaces = 2, unit = '万') => {
           return (value * 100).toFixed(decimalPlaces) + '%';
         }
-
-        // const formatUnit = (value, decimalPlaces = 1) =>{
-        //   return (value / 100).toFixed(decimalPlaces) + unit;
-        // }
 
         const formatWithUnit = (value, options) => {
           const { 
@@ -422,8 +392,6 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
         // // 示例用法
         // console.log(formatWithUnit(10000, { decimalPlaces: 2, thousandSeparator: ',', decimalSeparator: '.', unit: '' })); 
         // // 输出: 1.00万
-        // console.log(formatWithUnit(123456789, { decimalPlaces: 2, thousandSeparator: ',', decimalSeparator: '.', unit: '' })); 
-        // // 输出: 1.23亿
         
 
         // console.log('dataBinding',dataBinding);
@@ -449,13 +417,18 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
         // 检查是否有缩进缓存
         if(this.myIndentSettings){
-          console.log('***有缩进存储***');
+          console.log('***有缩进存储***', this.myIndentSettings);
           indentSettings = JSON.parse(this.myIndentSettings);
+        }
+
+        if(this.myPercentageSettings){
+          console.log('***有百分数存储***', this.myPercentageSettings);
+          percentageSettings = JSON.parse(this.myPercentageSettings);
         }
 
         let tableData = [];
         if (this.myInsertData) {
-          console.log('***有插入数据存储***');
+          console.log('***有插入数据存储***', this.myInsertData);
           tableData = this.applyInsertRecords(combinedTable);
         } else {
             tableData = combinedTable;
@@ -466,16 +439,6 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
         if (this._hotInstance) {
           this._hotInstance.destroy();
         }
-
-        // console.log('1111111--this.myIndentSettings',this.myIndentSettings);
-        // console.log('2222222--this.myMergeData',this.myMergeData);
-        // console.log('3333333--this.myInsertData',this.myInsertData);
-        // console.log('1111111--this.mycustomUnit',this.mycustomUnit);
-        // console.log('2222222--this.mycustomScale',mycustomScaleTmp);
-        // console.log('3333333--this.myCustomThousandSeparator',this.myCustomThousandSeparator);
-        // console.log('4444444--this.myRowHeader',myRowHeaderTmp);
-        // console.log('5555555--this.myColHeader',myColHeaderTmp);
-
 
         // 创建Handsontable实例
         this._hotInstance = new Handsontable(this._root, {
@@ -503,6 +466,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
           contextMenu: {
             callback: (key, options) => {
               console.log(`$$$Menu item '${key}' triggered`);
+              // this._hotInstance.render();
             },
             items: {
               ...Handsontable.plugins.ContextMenu.DEFAULT_ITEMS, // 保留默认菜单项
@@ -554,7 +518,61 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
                   this._hotInstance.render(); // 重新渲染表格
                 },
               },
-              mergeCells:{}
+              mergeCells:{},
+              "set_percentage": {
+                name: "设置为百分数",
+                callback: (_, selection) => {
+                  const selected = selection[0]; // 获取选中区域
+                  for (let row = selected.start.row; row <= selected.end.row; row++) {
+                    for (let col = selected.start.col; col <= selected.end.col; col++) {
+                      const cellMeta = this._hotInstance.getCellMeta(row, col);
+                      
+                      // 设置百分数格式
+                      const value = this._hotInstance.getDataAtCell(row, col);
+                      const formattedValue = typeof value === 'number' ? (value * 100).toFixed(2) + '%' : value;
+
+                      this._hotInstance.setDataAtCell(row, col, formattedValue);
+
+                      // 记录哪些单元格被设置为百分数
+                      const index = percentageSettings.findIndex(item => item.row === row && item.col === col);
+                      if (index === -1) {
+                        percentageSettings.push({ row, col, isPercentage: true });
+                      } else {
+                        percentageSettings[index].isPercentage = true;
+                      }
+                    }
+                  }
+                  this.savePercentageSettings(JSON.stringify(percentageSettings));
+                  console.log('percentageSettings',percentageSettings);
+                  console.log('this.myPercentageSettings',this.myPercentageSettings);
+                  this._hotInstance.render(); // 重新渲染表格
+                },
+              },  
+              "remove_percentage": {
+                name: "取消百分数设置",
+                callback: (_, selection) => {
+                  const selected = selection[0]; // 获取选中区域
+                  for (let row = selected.start.row; row <= selected.end.row; row++) {
+                    for (let col = selected.start.col; col <= selected.end.col; col++) {
+                      const cellMeta = this._hotInstance.getCellMeta(row, col);
+                      
+                      // 恢复为原始格式（移除百分数）
+                      const value = this._hotInstance.getDataAtCell(row, col);
+                      const formattedValue = value && value.includes('%') ? parseFloat(value.replace('%', '')) / 100 : value;
+
+                      this._hotInstance.setDataAtCell(row, col, formattedValue);
+
+                      // 移除百分数设置的记录
+                      const index = percentageSettings.findIndex(item => item.row === row && item.col === col);
+                      if (index !== -1) {
+                        percentageSettings.splice(index, 1); // 移除百分数设置的单元格记录
+                      }
+                    }
+                  }
+                  this.savePercentageSettings(JSON.stringify(percentageSettings));
+                  this._hotInstance.render(); // 重新渲染表格
+                },
+              },
             }
           },
           cells: function (row, col) {
@@ -576,12 +594,23 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
             cellProperties.renderer = function (instance, td, row, col, prop, value, cellProperties) {
               Handsontable.renderers.TextRenderer.apply(this, arguments);
 
-              // console.log("value",value);
-              // console.log(typeof value);
-              // 判断是否是数值类型
-              if (typeof value === 'number') {
+              // 判断是否是百分数设置
+              const percentageSetting = percentageSettings.find(item => item.row === row && item.col === col);
+              if (percentageSetting) {
+                // 如果是百分数设置，进行百分数格式化
+                if (typeof value === 'number') {
+                    const formattedValue = (value * 100).toFixed(2) + '%'; // 转换为百分数格式
+                    td.textContent = formattedValue;
+                    td.style.color = 'green'; // 设置百分数的样式（例如绿色）
+                }
+              } else if (typeof value === 'number') {
+              // 如果不是百分数设置，按照源代码逻辑格式化数值
+
+              //   // 判断是否是数值类型
+              //   if (typeof value === 'number') {
                 let formattedValue;
-                // 这里要写几个if判断和styling联动，是否设置百分数，保留几位小数 见formatPercentage（）方法
+
+                // !important!!!这里要写几个if判断和styling联动，是否设置百分数，保留几位小数 见formatPercentage（）方法
                 // 默认单位是个，设置个十百千万百万，见formatUnit（）方法
 
                 if (myCustomThousandSeparatorTmp === 1 || myCustomThousandSeparatorTmp === '1'){ 
@@ -624,7 +653,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
                 }
                 
                 td.style.color = 'blue'; // 设置公式结果的样式
-        
+
                 // 更新单元格显示值
                 td.textContent = formattedValue;
               }
@@ -639,8 +668,6 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
                 td.style.paddingLeft = `${cellProperties.indentLevel * 10}px`;
               } 
             }
-
-
 
             // const cell = indentSettings.find(item => item.row === row && item.col === col);
             // if (cell) {
@@ -670,7 +697,6 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
         });
 
         this._hotInstance.render();
-        console.log('AAAAAAAAATTENTION,表格这里执行了render()!!!!!!!')
 
     }
 
@@ -691,6 +717,18 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
       const myIndentSettings = indentSettings;
       this.dispatchEvent(new CustomEvent('propertiesChanged', { detail: { properties: { myIndentSettings } } }))
     };
+
+    saveAlignmentSettings(alignmentSettings) {
+      this.myAlignmentSettings = alignmentSettings;
+      const myAlignmentSettings = alignmentSettings;
+      this.dispatchEvent(new CustomEvent('propertiesChanged', { detail: { properties: { myAlignmentSettings } } }))
+    };
+
+    savePercentageSettings(percentageSettings) {
+      this.myPercentageSettings = percentageSettings;
+      const myPercentageSettings = percentageSettings;
+      this.dispatchEvent(new CustomEvent('propertiesChanged', { detail: { properties: { myPercentageSettings } } }))
+    }
 
 
     saveMergeCells() {
@@ -713,16 +751,13 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
         colspan: cell.colspan,
       }));
       this.savemyMergeData(JSON.stringify(myMergeData));
-      // localStorage.setItem('mergeCells', JSON.stringify(myMergeData));
-      console.log('$$$$$$$$$$myMergeData', myMergeData);
+      // console.log('$$$$$$$$$$myMergeData', myMergeData);
       // this.dispatchEvent(new CustomEvent('propertiesChanged', { detail: { properties: { myMergeData } } }))
     }
 
     loadMergeCells() {
       const myMergeData = JSON.parse(this.myMergeData || '[]');
       console.log('_____loadMergeCells',myMergeData);
-      // const myMergeData = JSON.parse(localStorage.getItem('mergeCells') || '[]');
-      // console.log('_____localStorage_loadMergeCells',myMergeData);
       if (myMergeData.length === 0) {
         console.log('No merge cell data in cache.');
         return;
@@ -742,7 +777,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
       this._hotInstance.updateSettings({ mergeCells: mergeCellsConfig });
 
-      console.log('Loaded merge cells from cache:', mergeCellsConfig);
+      // console.log('Loaded merge cells from cache:', mergeCellsConfig);
 
       // 恢复标记状态
       this.isLoadingMergeCells = false;
@@ -755,16 +790,14 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
     removeMergeCell(row, col) {
       // 从缓存中获取当前合并单元格数据
       let mergeCells = JSON.parse(this.myMergeData || '[]');
-      // JSON.parse(localStorage.getItem('mergeCells') || '[]');
   
       // 过滤掉与取消合并单元格匹配的记录
       mergeCells = mergeCells.filter(cell => !(cell.row === row && cell.col === col));
   
       // 更新缓存
       this.savemyMergeData(JSON.stringify(mergeCells));
-      localStorage.setItem('mergeCells', JSON.stringify(mergeCells));
   
-      console.log('Removed merge cell from cache:', { row, col });
+      // console.log('Removed merge cell from cache:', { row, col });
     }
   
     afterUnmergeCells(cellRange) {
@@ -781,11 +814,10 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
     applyInsertRecords(baseTableData) {
         let modifiedData = [...baseTableData];
         let myInsert = JSON.parse(this.myInsertData || '[]'); // 防止空数据抛出错误
-        // let mergedCells = JSON.parse(this.mergedCells || '[]'); // 防止空数据抛出错误
 
         // 初始化行插入和列插入的结果集
         let rowInserts = [];
-        let colInserts = []
+        let colInserts = [];
 
         // 分类存储行和列插入记录
         myInsert.forEach(record => {
@@ -800,62 +832,47 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
         rowInserts.sort((a, b) => a.index - b.index);
         colInserts.sort((a, b) => a.index - b.index);
 
+        // console.log('###rowInserts',rowInserts);
+        // console.log('###colInserts',colInserts);
+
+        // 应用新增行记录
+        rowInserts.forEach(record => {
+          // console.log('modifiedData2222222222',modifiedData);
+          const rowIndex = record.index;
+          const rowValues = record.value || [];
+
+          // 初始化行，确保新增的行具有与现有列数一致的长度
+          const newRow = Array(modifiedData[0].length).fill('');
+          rowValues.forEach((value, colIndex) => {
+              newRow[colIndex] = value; // 填充值
+          });
+
+          // 插入到指定位置
+          modifiedData.splice(rowIndex, 0, newRow);
+        });
+
         // 应用新增列记录
         colInserts.forEach(record => {
+          // console.log('modifiedData1111111111',modifiedData);
           const colIndex = record.index;
           const colValues = record.value || []; // 获取列值或初始化为空数组
 
           // 更新每一行，确保新增列值与行数匹配
           modifiedData.forEach((row, rowIndex) => {
               const value = colValues[rowIndex] || ''; // 如果列值未定义，则使用空字符串
-              row.splice(colIndex, 0, value);
+              if(row.length < rowInserts[0].value.length){ //避免插入的行的列数溢出
+                row.splice(colIndex, 0, value);
+              }
           });
 
-          // // 更新 mergedCells 中与列相关的索引
-          // mergedCells.forEach(merge => {
-          //     if (merge.col >= colIndex) {
-          //         merge.col += 1; // 右移合并列索引
-          //     }
-          // });
-
         });
-
-        // 应用新增行记录
-        rowInserts.forEach(record => {
-            const rowIndex = record.index;
-            const rowValues = record.value || [];
-
-            // 初始化行，确保新增的行具有与现有列数一致的长度
-            const newRow = Array(modifiedData[0].length).fill('');
-            rowValues.forEach((value, colIndex) => {
-                newRow[colIndex] = value; // 填充值
-            });
-
-            // 插入到指定位置
-            modifiedData.splice(rowIndex, 0, newRow);
-
-            // // 更新 mergedCells 中与行相关的索引
-            // mergedCells.forEach(merge => {
-            //     if (merge.row >= rowIndex) {
-            //         merge.row += 1; // 下移合并行索引
-            //     }
-            // });
-
-        });
-
-        // console.log('modifiedData4444444444444',JSON.stringify(modifiedData));
-        // // console.log('$mergedCells', JSON.stringify(mergedCells));
-        // console.log('@this.myInsertData',this.myInsertData);
-
-        // 应用合并单元格到 Handsontable
-        // this._hotInstance.updateSettings({ mergedCells });
 
         return modifiedData;
     }
 
     //***(completed)如果是中间插入的话，其后面所有的index都要跟着改变*** */
     afterCreateRow(index, amount) {
-        console.log('@index',index);
+        // console.log('@@@index',index);
         let myInsert = [];
         if(JSON.parse(this.myInsertData).length !== 0){
           myInsert = JSON.parse(this.myInsertData);
@@ -886,7 +903,6 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
         // !!!更新合并单元格数据
         let mergeCells = JSON.parse(this.myMergeData || '[]');
-        // JSON.parse(localStorage.getItem('mergeCells') || '[]');
 
         mergeCells = mergeCells.map(cell => {
             if (cell.row >= index) {
@@ -906,14 +922,12 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
         });
 
         let myIndentSettings = JSON.parse(this.myIndentSettings || '[]');
-
         // 更新缩进信息，增加行时需要调整行索引
         myIndentSettings.forEach(item => {
             if (item.row >= index) {
                 item.row += amount; // 调整新增行后面的行索引
             }
         });
-
         // 初始化新增行的缩进信息
         for (let i = 0; i < amount; i++) {
             for (let col = 0; col < columnCount; col++) {
@@ -921,14 +935,24 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
                 this._hotInstance.setCellMeta(newRowIndex, col, 'indentLevel', 0);
             }
         }
-
         this.saveIndentSettings(JSON.stringify(myIndentSettings));
+
+        //更新百分号设置
+        let myPercentageSettings = JSON.parse(this.myPercentageSettings || '[]');
+        myPercentageSettings.forEach(item => {
+          if (item.row >= index) {
+              item.row += amount; // 调整新增行后面的行索引
+          }
+        });
+        this.savePercentageSettings(JSON.stringify(myPercentageSettings));
+
+
         // 保存更新后的合并单元格数据
         this.savemyInsertData(JSON.stringify(myInsert));
         this.savemyMergeData(JSON.stringify(mergeCells));
-        // localStorage.setItem('mergeCells', JSON.stringify(mergeCells));
-
+        // console.log('@@@afterCreateRow之后的 insertData:', this.myInsertData);
         this.render();
+        
     }
 
     //***(completed)如果是中间插入的话，其右边所有的index都要跟着改变*** */
@@ -968,7 +992,6 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
         // !!!更新合并单元格数据
         let mergeCells = JSON.parse(this.myMergeData || '[]');
-        // JSON.parse(localStorage.getItem('mergeCells') || '[]');
 
         mergeCells = mergeCells.map(cell => {
             if (cell.col >= index) {
@@ -980,14 +1003,12 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
         });
 
         let myIndentSettings = JSON.parse(this.myIndentSettings || '[]');
-
         // 更新缩进信息，增加列时需要调整列索引
         myIndentSettings.forEach(item => {
           if (item.col >= index) {
               item.col += amount; // 调整新增列后面的列索引
           }
         });
-
         // 初始化新增列的缩进信息
         for (let i = 0; i < amount; i++) {
             const newCol = index + i;
@@ -995,15 +1016,22 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
                 this._hotInstance.setCellMeta(row, newCol, 'indentLevel', 0);
             }
         }
-
         this.saveIndentSettings(JSON.stringify(myIndentSettings));
+
+        //更新百分号设置
+        let myPercentageSettings = JSON.parse(this.myPercentageSettings || '[]');
+        myPercentageSettings.forEach(item => {
+          if (item.col >= index) {
+            item.col += amount; // 调整新增列后面的列索引
+          }
+        });
+        this.savePercentageSettings(JSON.stringify(myPercentageSettings));
 
         // this.myInsertData = myInsert;
         this.savemyInsertData(JSON.stringify(myInsert));
         this.savemyMergeData(JSON.stringify(mergeCells));
-        localStorage.setItem('mergeCells', JSON.stringify(mergeCells));
-        
         this.render();
+        // console.log('@@@afterCreateCol之后的 insertData:', this.myInsertData);
     }
 
      /***(completed)删除时候，其下边所有的index都要跟着改变***
@@ -1047,7 +1075,6 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
         //!!!更新合并单元格
 
         let mergeCells = JSON.parse(this.myMergeData || '[]');
-        // JSON.parse(localStorage.getItem('mergeCells') || '[]');
 
         mergeCells = mergeCells.filter(cell => cell.row + cell.rowspan <= index || cell.row >= index + amount);
     
@@ -1070,11 +1097,20 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
                 item.row -= amount;
             }
         });
-        
+
+        // 移除被删除行的百分号设置
+        let myPercentageSettings = JSON.parse(this.myPercentageSettings || '[]');
+        myPercentageSettings = myPercentageSettings.filter(item => item.row < index || item.row >= index + amount);
+        myPercentageSettings.forEach(item => {
+            if (item.row >= index + amount) {
+                item.row -= amount;
+            }
+        });
+
+        this.savePercentageSettings(JSON.stringify(myPercentageSettings));
         this.saveIndentSettings(JSON.stringify(myIndentSettings));
         this.savemyInsertData(JSON.stringify(myInsert));
         this.savemyMergeData(JSON.stringify(mergeCells));
-        localStorage.setItem('mergeCells', JSON.stringify(mergeCells));
         this.render();
     }
     
@@ -1125,7 +1161,6 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
         //！！！更新合并单元格
         let mergeCells = JSON.parse(this.myMergeData || '[]');
-        // JSON.parse(localStorage.getItem('mergeCells') || '[]');
 
         mergeCells = mergeCells.filter(cell => cell.col + cell.colspan <= index || cell.col >= index + amount);
     
@@ -1148,42 +1183,36 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
                 item.col -= amount;
             }
         });
-        
+
+        // 移除被删除列的百分号设置
+        let myPercentageSettings = JSON.parse(this.myPercentageSettings || '[]');
+        myPercentageSettings = myPercentageSettings.filter(item => item.col < index || item.col >= index + amount);
+        myPercentageSettings.forEach(item => {
+            if (item.col >= index + amount) {
+                item.col -= amount;
+            }
+        });
+
+        this.savePercentageSettings(JSON.stringify(myPercentageSettings));
         this.saveIndentSettings(JSON.stringify(myIndentSettings));
         this.savemyInsertData(JSON.stringify(myInsert));
         this.savemyMergeData(JSON.stringify(mergeCells));
-        localStorage.setItem('mergeCells', JSON.stringify(mergeCells));
         this.render();
     }
   
 
     afterChange(changes, source) {
-        console.log('Changes:', changes);
-        console.log('Source:', source);
+        // console.log('Changes:', changes);
+        // console.log('Source:', source);
         if (source === 'loadData') {
             return;
         }
+    
         let myInsert = [];
         if(this.myInsertData){
           myInsert = JSON.parse(this.myInsertData);
         }
         changes.forEach(([row, col, oldValue, newValue]) => {
-            // 检查是否是公式得出的结果
-            // if (typeof newValue === 'string' && newValue.startsWith('=')) {
-            //   const formattedResult = `Formatted: ${newValue}`;
-            //   this._hotInstance.setDataAtCell(row, col, formattedResult);
-            // }
-
-            // console.log('@@@是number！！！',typeof newValue); //newValue都是string类型的
-            // if (typeof newValue === 'number') {
-            //   console.log('@@@是number！！！',typeof newValue);
-            //   // 格式化数字，保留两位小数并添加千分位分隔符
-            //   const formattedResult = newValue.toLocaleString('zh-CN', {
-            //     minimumFractionDigits: 3, // 最少保留两位小数
-            //     maximumFractionDigits: 3  // 最多保留两位小数
-            //   });
-            //   this._hotInstance.setDataAtCell(row, col, formattedResult); // 设置格式化后的值
-            // }
             // 检查是否是行记录
             const record = myInsert.find(item => item.type === 'row' && item.index === row);
             if (record) {
@@ -1201,8 +1230,7 @@ function combinedRenderer(instance, td, row, col, prop, value, cellProperties) {
 
         this.savemyInsertData(JSON.stringify(myInsert));
         this.saveMergeCells();
-        // console.log('Updated insertData33333333333333:', this.myInsertData);
-        // this.render();
+        // console.log('@@@afterChange之后的 insertData:', this.myInsertData);
     }
 
   }
