@@ -7,8 +7,6 @@
           display: block;
           font-size: .875rem;
           color: #999;
-        }
-        #root label {
           margin-top: 16px;
         }
         #root input, #root select {
@@ -50,6 +48,15 @@
         </div>
         <div>
           <h4>数据格式设置</h4>
+          <div id="myCustomThousandSeparator">
+              <label for="myCustomThousandSeparator-dropdown">数据格式</label>
+              <select id="myCustomThousandSeparator-dropdown" style="width: 50%; height: 100%;">
+                <option value=1>12,345.67</option>
+                <option value=2>12.345,67</option>
+                <option value=3>12 345.67</option>
+                <option value=100>原始格式</option>
+              </select>
+          </div>
           <div id="myCustomUnit">
               <label for="myCustomUnit-input">单位</label>
               <input id="myCustomUnit-input" style="width: 70%; height: 100%;" placeholder="请输入自定义单位名称"/>
@@ -66,17 +73,9 @@
                 <option value=2>2</option>
                 <option value=3>3</option>
                 <option value=4>4</option>
-                <option value=4>5</option>
-                <option value=4>6</option>
-                <option value=4>7</option>
-              </select>
-          </div>
-          <div id="myCustomThousandSeparator">
-              <label for="myCustomThousandSeparator-dropdown">数据格式</label>
-              <select id="myCustomThousandSeparator-dropdown" style="width: 50%; height: 100%;">
-                <option value=1>12,345.67</option>
-                <option value=2>12.345,67</option>
-                <option value=3>12 345.67</option>
+                <option value=5>5</option>
+                <option value=6>6</option>
+                <option value=7>7</option>
               </select>
           </div>
         </div>
@@ -138,6 +137,28 @@
         this._shadowRoot = this.attachShadow({ mode: 'open' })
         this._shadowRoot.appendChild(template.content.cloneNode(true))
         this._root = this._shadowRoot.getElementById('root')
+
+    
+        // 获取需要禁用的表单元素
+        this._myCustomUnitInput = this._shadowRoot.getElementById('myCustomUnit-input')
+        this._myCustomScaleInput = this._shadowRoot.getElementById('myCustomScale-input')
+        this._myCustomDecimalPlacesDropdown = this._shadowRoot.getElementById('myCustomDecimalPlaces-dropdown')
+        this._myCustomThousandSeparatorDropdown = this._shadowRoot.getElementById('myCustomThousandSeparator-dropdown')
+
+        this._myCustomThousandSeparatorDropdown.addEventListener('change', () => {
+          if (this._myCustomThousandSeparatorDropdown.value === '100' || this._myCustomThousandSeparatorDropdown.value === 100) {
+            this.clearAndDisableFields();
+          } else {
+            this.enableFields();
+          }
+        });
+
+        // 初始化时候判断是否需要禁用表单元素
+        if (this._myCustomThousandSeparatorDropdown.value === '100' || this._myCustomThousandSeparatorDropdown.value === 100) {
+          this.clearAndDisableFields();
+        } else {
+          this.enableFields();
+        };
   
         this._button = this._shadowRoot.getElementById('button')
         this._button.addEventListener('click', () => {
@@ -168,98 +189,104 @@
               myRowHeader,
               myColHeader
             } } }));
-          // console.log('按钮被点击了--myRowHeader',myRowHeader);
-          // console.log('按钮被点击了--myColHeader',myColHeader);
         })
       }
+
+      // 当选中原始格式的时候禁用其他三个数据格式设置
+      clearAndDisableFields() { 
+        this._myCustomUnitInput.value = '';
+        this._myCustomScaleInput.value = '';
+        this._myCustomDecimalPlacesDropdown.value = 0;
+        this._myCustomThousandSeparatorDropdown.value = 100;
+    
+        this._myCustomUnitInput.disabled = true;
+        this._myCustomScaleInput.disabled = true;
+        this._myCustomDecimalPlacesDropdown.disabled = true;
+      }
+    
+      enableFields() {
+        this._myCustomUnitInput.disabled = false;
+        this._myCustomScaleInput.disabled = false;
+        this._myCustomDecimalPlacesDropdown.disabled = false;
+      }
+    
   
       async onCustomWidgetAfterUpdate (changedProps) {
         if (changedProps.myIndentSettings) {
           const myIndentSettings = changedProps.myIndentSettings;
           this._shadowRoot.getElementById('myIndentSettings-input').value = changedProps.myIndentSettings;
-          // console.log('onCustomWidgetAfterUpdate---myIndentSettings',myIndentSettings);
         };
 
         if (changedProps.myInsertData) {
           const myInsertData = changedProps.myInsertData;
           this._shadowRoot.getElementById('myInsertData-input').value = changedProps.myInsertData;
-          // console.log('onCustomWidgetAfterUpdate---myInsertData',myInsertData);
         };
 
         if (changedProps.myMergeData) {
           const myMergeData = changedProps.myMergeData;
           this._shadowRoot.getElementById('myMergeData-input').value = changedProps.myMergeData;
-          // console.log('onCustomWidgetAfterUpdate---myMergeData',myMergeData);
         };
 
         if (changedProps.myPercentageSettings) {
           const myPercentageSettings = changedProps.myPercentageSettings;
           this._shadowRoot.getElementById('myPercentageSettings-input').value = changedProps.myPercentageSettings;
-          // console.log('onCustomWidgetAfterUpdate---myPercentageSettings',myPercentageSettings);
         };
 
         if (changedProps.myAlignmentSettings) {
           const myAlignmentSettings = changedProps.myAlignmentSettings;
           this._shadowRoot.getElementById('myAlignmentSettings-input').value = changedProps.myAlignmentSettings;
-          // console.log('onCustomWidgetAfterUpdate---myAlignmentSettings',myAlignmentSettings);
         };
 
         if (changedProps.myCustomUnit) {
           const myCustomUnit = changedProps.myCustomUnit;
           this._shadowRoot.getElementById('myCustomUnit-input').value = changedProps.myCustomUnit;
-          // console.log('onCustomWidgetAfterUpdate---myCustomUnit',myCustomUnit);
         };
 
         if (changedProps.myCustomScale) {
           const myCustomScale = changedProps.myCustomScale;
           this._shadowRoot.getElementById('myCustomScale-input').value = changedProps.myCustomScale;
-          // console.log('onCustomWidgetAfterUpdate---myCustomScale',myCustomScale);
         };
 
         if (changedProps.myCustomDecimalPlaces !== undefined && changedProps.myCustomDecimalPlaces !== null && changedProps.myCustomDecimalPlaces !== '') {
           let myCustomDecimalPlaces = changedProps.myCustomDecimalPlaces;
           this._shadowRoot.getElementById('myCustomDecimalPlaces-dropdown').value = myCustomDecimalPlaces;
-          // console.log('onCustomWidgetAfterUpdate---myCustomDecimalPlaces-if',myCustomDecimalPlaces);
         } else {
           let myCustomDecimalPlaces = 2;
           this._shadowRoot.getElementById('myCustomDecimalPlaces-dropdown').value = myCustomDecimalPlaces;
-          // console.log('onCustomWidgetAfterUpdate---myCustomDecimalPlaces-else',myCustomDecimalPlaces);
         };
 
         if (changedProps.myCustomThousandSeparator !== undefined && changedProps.myCustomThousandSeparator !== null && changedProps.myCustomThousandSeparator !== '') {
-          let myCustomThousandSeparator = changedProps.myCustomThousandSeparator;
-          this._shadowRoot.getElementById('myCustomThousandSeparator-dropdown').value = myCustomThousandSeparator;
-          // console.log('onCustomWidgetAfterUpdate---myCustomThousandSeparator-if',myCustomThousandSeparator);
+          if (changedProps.myCustomThousandSeparator === 100 || changedProps.myCustomThousandSeparator === '100') {
+            this.clearAndDisableFields();
+          } else {
+            this.enableFields();
+            let myCustomThousandSeparator = changedProps.myCustomThousandSeparator;
+            this._shadowRoot.getElementById('myCustomThousandSeparator-dropdown').value = myCustomThousandSeparator;
+          }
         } else {
-          let myCustomThousandSeparator = 0;
+          let myCustomThousandSeparator = 1;
           this._shadowRoot.getElementById('myCustomThousandSeparator-dropdown').value = myCustomThousandSeparator;
-          // console.log('onCustomWidgetAfterUpdate---myCustomThousandSeparator-else',myCustomThousandSeparator);
+          this.enableFields();
         };
 
         if (changedProps.myRowHeader !== undefined && changedProps.myRowHeader !== null && changedProps.myRowHeader !== '') {
           let myRowHeader = changedProps.myRowHeader;
           this._shadowRoot.getElementById('myRowHeader-dropdown').value = myRowHeader;
-          // console.log('onCustomWidgetAfterUpdate---myRowHeader-if',myRowHeader);
         } else {
           let myRowHeader = true;
           this._shadowRoot.getElementById('myRowHeader-dropdown').value = myRowHeader;
-          // console.log('onCustomWidgetAfterUpdate---myRowHeader-else',myRowHeader);
         };
 
         if (changedProps.myColHeader !== undefined && changedProps.myColHeader !== null && changedProps.myColHeader !== '') {
           let myColHeader = changedProps.myColHeader;
           this._shadowRoot.getElementById('myColHeader-dropdown').value = myColHeader;
-          // console.log('onCustomWidgetAfterUpdate---myColHeader-if',myColHeader);
         } else {
           let myColHeader = true;
           this._shadowRoot.getElementById('myColHeader-dropdown').value = myColHeader;
-          // console.log('onCustomWidgetAfterUpdate---myColHeader-else',myColHeader);
         };
 
       }
     }
   
-    customElements.define('com-sap-sac-exercise-table-styling', Styling)
+    customElements.define('com-sap-sac-exercise-table-styling-local', Styling)
   })()
-  
-  
